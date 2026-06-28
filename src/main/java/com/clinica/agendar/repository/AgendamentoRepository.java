@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AgendamentoRepository extends JpaRepository<Agendamentos, Long> {
-    List<Agendamentos> findByPacienteid(Long pacienteId);
+    List<Agendamentos> findByPacienteId(Long pacienteId);
     List<Agendamentos> findByMedico(String medico);
-    List<Agendamentos> findByStatus(StatusAgendamento status);
-    List<Agendamentos> findByMedicoAndDataHoraConsultaAndStatus(String medico, LocalDateTime dataHoraConsulta, StatusAgendamento status);
+    List<Agendamentos> findByStatusAgendamento(StatusAgendamento status);
+    List<Agendamentos> findByMedicoAndDataHoraConsultaAndStatusAgendamento(String medico, LocalDateTime dataHoraConsulta, StatusAgendamento status);
 
 }

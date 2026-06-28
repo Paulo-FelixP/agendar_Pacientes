@@ -14,7 +14,8 @@ public class PacienteDTO {
     private String Telefone;
 
     @NotBlank(message = "CPF é obrigatorio")
-    private String CPF;
+    private String Cpf;
 
     private String email;
+
 }

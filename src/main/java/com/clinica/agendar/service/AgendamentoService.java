@@ -30,7 +30,7 @@ public class AgendamentoService {
                     "Não é possivel colocar Datas e horas passadas."
             );
         }
-        List<Agendamentos> agendamentosNoHorario = agendamentoRepository.findByMedicoAndDataHoraConsultaAndStatus(dto.getMedico(), dto.getDataHoraConsulta(), StatusAgendamento.Agendado );
+        List<Agendamentos> agendamentosNoHorario = agendamentoRepository.findByMedicoAndDataHoraConsultaAndStatusAgendamento(dto.getMedico(), dto.getDataHoraConsulta(), StatusAgendamento.Agendado );
 
         if(!agendamentosNoHorario.isEmpty()) {
             throw new RegraDeNegException(
@@ -67,11 +67,11 @@ public class AgendamentoService {
     public List<Agendamentos> listar(Long pacienteId, String medico, StatusAgendamento statusAgendamento) {
 
         if (pacienteId != null)
-            return agendamentoRepository.findByPacienteid(pacienteId);
+            return agendamentoRepository.findByPacienteId(pacienteId);
         if (medico != null)
             return agendamentoRepository.findByMedico(medico);
         if (statusAgendamento != null)
-            return agendamentoRepository.findByStatus(statusAgendamento);
+            return agendamentoRepository.findByStatusAgendamento(statusAgendamento);
         return agendamentoRepository.findAll();
     }
 
