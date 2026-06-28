@@ -53,7 +53,7 @@ async function carregarPacientes() {
     const pacienteSelecionado = selectPaciente.value;
 
     selectPaciente.innerHTML = `<option value="">Selecione o paciente...</option>` +
-        lista.map(p => `<option value="${p.id}">${p.nome} — ${p.cpf}</option>`).join("");
+        lista.map(p => `<option value="${p.id}">${p.nome} — ${mascararCPF(p.cpf)}</option>`).join("");
 
     if (pacienteSelecionado) selectPaciente.value = pacienteSelecionado;
 
@@ -68,7 +68,7 @@ async function carregarPacientes() {
     document.getElementById("pac-tbody").innerHTML = lista.map(p => `
         <tr>
           <td>${p.nome}</td>
-          <td>${p.cpf || "—"}</td>
+          <td>${mascararCPF(p.cpf)}</td>
           <td>${p.telefone || "—"}</td>
           <td>${p.email || "—"}</td>
         </tr>
@@ -493,6 +493,7 @@ async function iniciarSistema() {
 document.addEventListener("DOMContentLoaded", iniciarSistema);
 
 // mmascarar cpf
+
 function mascararCPF(cpf) {
   if (!cpf) return "—";
 
@@ -500,5 +501,5 @@ function mascararCPF(cpf) {
 
   if (numeros.length !== 11) return cpf;
 
-  return "********" + numeros.slice(-3);
+  return `***.***.***-${numeros.slice(-2)}`;
 }
