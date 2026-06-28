@@ -7,7 +7,7 @@ import { PacienteService, Paciente } from '../services/paciente';
   selector: 'app-pacientes',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './pacientes.component.html'
+  templateUrl: './pacientes.html'
 })
 export class PacientesComponent implements OnInit {
   pacientes: Paciente[] = [];

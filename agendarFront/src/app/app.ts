@@ -6,8 +6,8 @@ import { AgendamentosComponent } from './agendamentos/agendamentos';
   selector: 'app-root',
   standalone: true,
   imports: [PacientesComponent, AgendamentosComponent],
-  templateUrl: './app.component.html'
+  templateUrl: './app.html'
 })
-export class AppComponent {
+export class App {
   title = 'Agendar Pacientes';
 }

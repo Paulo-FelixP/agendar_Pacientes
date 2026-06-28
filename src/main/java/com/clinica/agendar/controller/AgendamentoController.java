@@ -35,7 +35,7 @@ public class AgendamentoController {
         return ResponseEntity.ok(agendamentoService.listar(pacienteId, medico, status));
     }
 
-    @PutMapping("/cancelar")
+    @PutMapping("/cancelar/{id}")
     public ResponseEntity<Agendamentos> cancelar(@PathVariable Long id, @Valid @RequestBody CancelamentoDTO dto){
         return ResponseEntity.ok(agendamentoService.cancelar(id, dto));
     }
