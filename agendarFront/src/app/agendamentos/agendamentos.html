@@ -1,0 +1,41 @@
+<h2>Agendamentos</h2>
+
+<form (ngSubmit)="salvar()">
+  <select name="pacienteId" [(ngModel)]="novo.pacienteId" required>
+    <option [ngValue]="0" disabled>Selecione o paciente</option>
+    <option *ngFor="let p of pacientes" [ngValue]="p.id">{{ p.nome }}</option>
+  </select>
+
+  <select name="medico" [(ngModel)]="novo.medico" required>
+    <option value="" disabled>Selecione o médico</option>
+    <option *ngFor="let nome of medicos | keyvalue" [value]="nome.key">
+      {{ nome.key }} — {{ nome.value }}
+    </option>
+  </select>
+
+  <input type="datetime-local" name="dataHoraConsulta" [(ngModel)]="novo.dataHoraConsulta" required>
+
+  <select name="tipoAtendimento" [(ngModel)]="novo.tipoAtendimento" required>
+    <option value="PRESENCIAL">Presencial</option>
+    <option value="ONLINE">Online</option>
+  </select>
+
+  <button type="submit">Agendar</button>
+</form>
+
+<p class="erro" *ngIf="erro">{{ erro }}</p>
+
+<table>
+  <thead>
+  <tr><th>Paciente</th><th>Médico</th><th>Data/Hora</th><th>Tipo</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let a of agendamentos">
+    <td>{{ a.pacienteId }}</td>
+    <td>{{ a.medico }}</td>
+    <td>{{ a.dataHoraConsulta }}</td>
+    <td>{{ a.tipoAtendimento }}</td>
+    <td>{{ a.statusAgendamento }}</td>
+  </tr>
+  </tbody>
+</table>

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PacienteService, Paciente } from '../services/paciente.ts';
+import { PacienteService, Paciente } from '../services/paciente';
 
 @Component({
   selector: 'app-pacientes',
