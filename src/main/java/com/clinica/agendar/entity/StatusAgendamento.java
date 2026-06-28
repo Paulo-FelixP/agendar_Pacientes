@@ -1,5 +1,5 @@
 package com.clinica.agendar.entity;
 
-public enum StatusAtendimento {
+public enum StatusAgendamento {
     Agendado, Cancelado
 }
