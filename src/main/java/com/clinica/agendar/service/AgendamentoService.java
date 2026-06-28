@@ -11,6 +11,8 @@ import com.clinica.agendar.repository.AgendamentoRepository;
 import com.clinica.agendar.repository.PacienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.domain.Specification;
+import com.clinica.agendar.repository.specification.AgendamentoSpecification;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -83,16 +85,17 @@ public class AgendamentoService {
         return agendamentoRepository.save(agendamento);
     }
 
-    public List<Agendamentos> listar(Long pacienteId, String medico, StatusAgendamento statusAgendamento) {
 
-        if (pacienteId != null)
-            return agendamentoRepository.findByPacienteId(pacienteId);
-        if (medico != null)
-            return agendamentoRepository.findByMedico(medico);
-        if (statusAgendamento != null)
-            return agendamentoRepository.findByStatusAgendamento(statusAgendamento);
-        return agendamentoRepository.findAll();
+    public List<Agendamentos> listar(Long pacienteId, String medico, StatusAgendamento status) {
+
+        Specification<Agendamentos> specification = Specification.where(AgendamentoSpecification.paciente(pacienteId)).and(
+                AgendamentoSpecification.medico(medico))
+                        .and(
+                                AgendamentoSpecification.status(status));
+
+        return agendamentoRepository.findAll(specification);
     }
+
 
     public List<String> horariosDisponiveis(String medico, String data){
         LocalDate dia = LocalDate.parse(data);
@@ -101,8 +104,8 @@ public class AgendamentoService {
         List<LocalDateTime> todos = new ArrayList<>();
         LocalDateTime h = LocalDateTime.of(dia, LocalTime.of(8, 0));
         while (h.isBefore(fim)) {
-            todos.add(h);
-            h = h.plusMinutes(30);
+            todos.add(h);h = h.plusMinutes(30);
+
 
         }
         return todos.stream().filter(horario -> !agendamentoRepository.existsByMedicoAndDataHoraConsultaBetweenAndStatusAgendamento(medico,horario.minusMinutes(29),

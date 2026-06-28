@@ -8,5 +8,5 @@ import lombok.Data;
 public class CancelamentoDTO {
 
     @NotBlank(message = "o motivo do cancelamento é obrigatorio!")
-    private String Motivo;
+    private String motivo;
 }

@@ -30,9 +30,9 @@ public class AgendamentoController {
     public ResponseEntity<List<Agendamentos>> listar(
             @RequestParam(required = false) Long pacienteId,
             @RequestParam(required = false) String medico,
-            @RequestParam(required = false)StatusAgendamento status
+            @RequestParam(required = false)StatusAgendamento statusAgendamento
             ){
-        return ResponseEntity.ok(agendamentoService.listar(pacienteId, medico, status));
+        return ResponseEntity.ok(agendamentoService.listar(pacienteId, medico, statusAgendamento));
     }
 
     @PutMapping("/cancelar/{id}")
@@ -41,8 +41,8 @@ public class AgendamentoController {
     }
 
     @GetMapping("/horarios-disponiveis")
-    public ResponseEntity<AgendamentoService> horariosDisponiveis(@RequestParam String medico, @RequestParam String data){
-        return ResponseEntity.ok((AgendamentoService) agendamentoService.horariosDisponiveis(medico, data));
+    public ResponseEntity<List<String>> horariosDisponiveis(@RequestParam String medico, @RequestParam String data){
+        return ResponseEntity.ok((agendamentoService.horariosDisponiveis(medico, data)));
 
     }
 }

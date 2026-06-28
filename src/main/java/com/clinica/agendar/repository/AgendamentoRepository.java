@@ -1,6 +1,7 @@
 package com.clinica.agendar.repository;
 
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.clinica.agendar.entity.Agendamentos;
 import com.clinica.agendar.entity.StatusAgendamento;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,11 +9,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface AgendamentoRepository extends JpaRepository<Agendamentos, Long> {
+public interface AgendamentoRepository extends JpaRepository<Agendamentos, Long>, JpaSpecificationExecutor<Agendamentos> {
     List<Agendamentos> findByPacienteId(Long pacienteId);
     List<Agendamentos> findByMedico(String medico);
     List<Agendamentos> findByStatusAgendamento(StatusAgendamento status);
     List<Agendamentos> findByMedicoAndDataHoraConsultaAndStatusAgendamento(String medico, LocalDateTime dataHoraConsulta, StatusAgendamento status);
     boolean existsByMedicoAndDataHoraConsultaBetweenAndStatusAgendamento(String medico, LocalDateTime inicio, LocalDateTime fim, StatusAgendamento status);
-
+    List<Agendamentos> findByPacienteIdAndMedicoAndStatusAgendamento(Long pacienteId, String medico, StatusAgendamento status);
 }

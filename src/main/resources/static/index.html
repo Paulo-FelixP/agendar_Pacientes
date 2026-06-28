@@ -1,13 +1,188 @@
-<!doctype html>
-<html lang="en" data-beasties-container>
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <title>AgendarFront</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-<style>body{font-family:system-ui,sans-serif;background:#f3f6f5;margin:0}</style><link rel="stylesheet" href="styles-3HRPQ56U.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles-3HRPQ56U.css"></noscript></head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clínica — Agendamentos</title>
+<link rel="stylesheet" href="style.css">
+</head>
 <body>
-  <app-root></app-root>
-<script src="polyfills-RV3JTMEC.js" type="module"></script><script src="main-M3QRUPCL.js" type="module"></script></body>
+
+<header>
+  <div class="brand"> Agendar Consultas <span>Sistema de Agendamentos</span></div>
+  <nav>
+    <button onclick="mostrarPagina('agendamentos')" id="nav-agendamentos" class="ativo">Agendamentos</button>
+    <button onclick="mostrarPagina('pacientes')" id="nav-pacientes">Pacientes</button>
+  </nav>
+</header>
+
+<div class="pagina ativa" id="pagina-agendamentos">
+  <div class="secao-header">
+    <div><h1>Agendamentos</h1><p>Gerencie as consultas da clínica</p></div>
+    <button class="btn btn-primary" onclick="abrirFormAgendamento()">+ Novo agendamento</button>
+  </div>
+
+  <div class="alerta alerta-ok"   id="ag-sucesso"></div>
+  <div class="alerta alerta-erro" id="ag-erro"></div>
+
+  <div class="card" id="form-agendamento" style="display:none">
+    <h2>Novo Agendamento</h2>
+    <div class="form-grid">
+
+      <div class="campo">
+        <label>Paciente *</label>
+        <select id="ag-paciente"><option value="">Selecione o paciente...</option></select>
+        <button class="btn-link" id="btn-novo-paciente" onclick="toggleMiniCadastroPaciente()" style="margin-top:6px;text-align:left">+ Cadastrar novo paciente</button>
+        <div id="mini-cadastro-paciente" class="mini-form" style="display:none">
+          <h4>Novo Paciente</h4>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <input type="text"  id="mini-nome"     placeholder="Nome completo *">
+            <input type="text"  id="mini-cpf"      placeholder="CPF *">
+            <input type="text"  id="mini-telefone" placeholder="Telefone *">
+            <input type="email" id="mini-email"    placeholder="E-mail *">
+            <button class="btn btn-primary btn-sm" onclick="cadastrarPacienteESelecionar()" style="width:fit-content">Cadastrar e selecionar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label>Médico *</label>
+        <select id="ag-medico" onchange="buscarHorarios()"><option value="">Selecione o médico...</option></select>
+      </div>
+
+      <div class="campo">
+        <label>Data *</label>
+        <input type="date" id="ag-data" onchange="buscarHorarios()">
+      </div>
+
+      <div class="campo">
+        <label>Tipo de atendimento *</label>
+        <select id="ag-tipo">
+          <option value="PRESENCIAL">Presencial</option>
+          <option value="ONLINE">Online</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div style="margin-top:18px">
+      <label>Horário *</label>
+      <div id="horarios-vazio" class="alerta alerta-info" style="margin-top:8px;display:block">Selecione um médico e uma data para ver os horários disponíveis.</div>
+      <div id="horarios-cheio" class="alerta alerta-erro" style="margin-top:8px;display:none">Nenhum horário disponível neste dia para este médico.</div>
+      <div id="horarios-container" style="display:none">
+        <div class="horarios-grid" id="horarios-grid"></div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <button class="btn btn-primary" onclick="criarAgendamento()">Confirmar agendamento</button>
+      <button class="btn btn-outline" onclick="fecharFormAgendamento()">Cancelar</button>
+    </div>
+  </div>
+
+
+     <div class="card">
+      <h2>Filtros</h2>
+
+      <div class="form-grid">
+
+        <div class="campo">
+          <label>Paciente</label>
+          <select id="filtro-paciente">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label>Médico</label>
+          <select id="filtro-medico">
+            <option value="">Todos</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label>Status</label>
+          <select id="filtro-status">
+            <option value="">Todos</option>
+            <option value="AGENDADO">Agendado</option>
+            <option value="CANCELADO">Cancelado</option>
+          </select>
+        </div>
+
+      </div>
+
+    <div class="form-footer">
+      <button class="btn btn-primary" onclick="filtrarAgendamentos()">
+        Filtrar
+      </button>
+
+      <button class="btn btn-outline" onclick="limparFiltros()">
+        Limpar
+      </button>
+    </div>
+    </div>
+
+  <div class="card">
+    <h2>Lista de agendamentos</h2>
+    <div id="ag-loading" class="loading">Carregando...</div>
+    <div class="tabela-wrap">
+      <table id="ag-tabela" style="display:none">
+        <thead><tr><th>Paciente</th><th>Médico</th><th>Data / Hora</th><th>Tipo</th><th>Status</th><th>Motivo cancelamento</th><th></th></tr></thead>
+        <tbody id="ag-tbody"></tbody>
+      </table>
+    </div>
+    <div id="ag-vazio" class="vazio" style="display:none"><p>Nenhum agendamento encontrado.</p></div>
+  </div>
+</div>
+
+<div class="pagina" id="pagina-pacientes">
+  <div class="secao-header">
+    <div><h1>Pacientes</h1><p>Cadastre e consulte os pacientes</p></div>
+  </div>
+
+  <div class="alerta alerta-ok"   id="pac-sucesso"></div>
+  <div class="alerta alerta-erro" id="pac-erro"></div>
+
+  <div class="card">
+    <h2>Cadastrar Paciente</h2>
+    <div class="form-grid">
+      <div class="campo"><label>Nome *</label><input type="text" id="pac-nome" placeholder="Nome completo"></div>
+      <div class="campo"><label>CPF *</label><input type="text" id="pac-cpf" placeholder="000.000.000-00"></div>
+      <div class="campo"><label>Telefone *</label><input type="text" id="pac-telefone" placeholder="(00) 00000-0000"></div>
+      <div class="campo"><label>E-mail *</label><input type="email" id="pac-email" placeholder="email@exemplo.com"></div>
+    </div>
+    <div class="form-footer">
+      <button class="btn btn-primary" onclick="cadastrarPaciente()">Cadastrar</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Pacientes cadastrados</h2>
+    <div id="pac-loading" class="loading">Carregando...</div>
+    <div class="tabela-wrap">
+      <table id="pac-tabela" style="display:none">
+        <thead><tr><th>Nome</th><th>CPF</th><th>Telefone</th><th>E-mail</th></tr></thead>
+        <tbody id="pac-tbody"></tbody>
+      </table>
+    </div>
+    <div id="pac-vazio" class="vazio" style="display:none"><p>Nenhum paciente cadastrado.</p></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-cancelamento">
+  <div class="modal">
+    <h3>Cancelar Agendamento</h3>
+    <div class="campo">
+      <label>Motivo do cancelamento *</label>
+      <textarea id="motivo-cancelamento" placeholder="Informe o motivo..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="fecharModal()">Voltar</button>
+      <button class="btn btn-danger"  onclick="confirmarCancelamento()">Confirmar cancelamento</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
 </html>
