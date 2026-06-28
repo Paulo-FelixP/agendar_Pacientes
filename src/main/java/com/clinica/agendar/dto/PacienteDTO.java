@@ -8,13 +8,13 @@ import lombok.Data;
 public class PacienteDTO {
 
     @NotBlank(message = "Nome é Obrigatorio")
-    private String Nome;
+    private String nome;
 
     @NotBlank(message = "Telefone é obrigatorio!")
-    private String Telefone;
+    private String telefone;
 
     @NotBlank(message = "CPF é obrigatorio")
-    private String Cpf;
+    private String cpf;
 
     private String email;
 
