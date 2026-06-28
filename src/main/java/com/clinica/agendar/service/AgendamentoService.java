@@ -12,8 +12,12 @@ import com.clinica.agendar.repository.PacienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +34,22 @@ public class AgendamentoService {
                     "Não é possivel colocar Datas e horas passadas."
             );
         }
-        List<Agendamentos> agendamentosNoHorario = agendamentoRepository.findByMedicoAndDataHoraConsultaAndStatusAgendamento(dto.getMedico(), dto.getDataHoraConsulta(), StatusAgendamento.Agendado );
+
+        int hora = dto.getDataHoraConsulta().getHour();
+        if(hora < 8 || hora > 18) {
+            throw new RegraDeNegException("Atendimento das 08:00 as 18:00");
+        }
+
+        LocalDateTime inicio = dto.getDataHoraConsulta().minusMinutes(29);
+        LocalDateTime fim = dto.getDataHoraConsulta().plusMinutes(29);
+        boolean temConflito = agendamentoRepository.existsByMedicoAndDataHoraConsultaBetweenAndStatusAgendamento(dto.getMedico(), inicio, fim, StatusAgendamento.AGENDADO);
+        if(temConflito) {
+            throw new RegraDeNegException("Ja existe um agendamento cadastrado com esse data e Hora.");
+        }
+
+
+
+        List<Agendamentos> agendamentosNoHorario = agendamentoRepository.findByMedicoAndDataHoraConsultaAndStatusAgendamento(dto.getMedico(), dto.getDataHoraConsulta(), StatusAgendamento.AGENDADO );
 
         if(!agendamentosNoHorario.isEmpty()) {
             throw new RegraDeNegException(
@@ -44,8 +63,8 @@ public class AgendamentoService {
         Agendamentos agendamento = new Agendamentos();
         agendamento.setPaciente(paciente);
         agendamento.setMedico(dto.getMedico());
-        agendamento.setDataHoraConsulta(LocalDateTime.now());
-        agendamento.setStatusAgendamento(StatusAgendamento.Agendado);
+        agendamento.setDataHoraConsulta(dto.getDataHoraConsulta());
+        agendamento.setStatusAgendamento(StatusAgendamento.AGENDADO);
         agendamento.setTipoAtendimento(dto.getTipoAtendimento());
 
         return agendamentoRepository.save(agendamento);
@@ -54,11 +73,11 @@ public class AgendamentoService {
     public Agendamentos cancelar (Long id, CancelamentoDTO dto){
         Agendamentos agendamento = agendamentoRepository.findById(id).orElseThrow(() -> new RegraDeNegException("Agendamento não encontrado"));
 
-        if(agendamento.getStatusAgendamento() == StatusAgendamento.Cancelado) {
+        if(agendamento.getStatusAgendamento() == StatusAgendamento.CANCELADO) {
             throw new RegraDeNegException("Agendamento ja esta cancelado");
         }
 
-        agendamento.setStatusAgendamento(StatusAgendamento.Cancelado);
+        agendamento.setStatusAgendamento(StatusAgendamento.CANCELADO);
         agendamento.setMotivoCancelamento(dto.getMotivo());
 
         return agendamentoRepository.save(agendamento);
@@ -74,5 +93,21 @@ public class AgendamentoService {
             return agendamentoRepository.findByStatusAgendamento(statusAgendamento);
         return agendamentoRepository.findAll();
     }
+
+    public List<String> horariosDisponiveis(String medico, String data){
+        LocalDate dia = LocalDate.parse(data);
+        LocalDateTime fim = LocalDateTime.of(dia, LocalTime.of(18, 0));
+
+        List<LocalDateTime> todos = new ArrayList<>();
+        LocalDateTime h = LocalDateTime.of(dia, LocalTime.of(8, 0));
+        while (h.isBefore(fim)) {
+            todos.add(h);
+            h = h.plusMinutes(30);
+
+        }
+        return todos.stream().filter(horario -> !agendamentoRepository.existsByMedicoAndDataHoraConsultaBetweenAndStatusAgendamento(medico,horario.minusMinutes(29),
+                horario.plusMinutes(29), StatusAgendamento.AGENDADO )).map(horario -> horario.toLocalTime().toString()).collect(Collectors.toList());
+    }
+
 
 }

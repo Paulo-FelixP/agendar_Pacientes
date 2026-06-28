@@ -28,7 +28,7 @@ public class Agendamentos {
     @Enumerated(EnumType.STRING)
     private TipoAtendimento tipoAtendimento;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private StatusAgendamento statusAgendamento;
 
     private String medico;
