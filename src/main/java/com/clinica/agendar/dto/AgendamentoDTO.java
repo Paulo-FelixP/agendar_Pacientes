@@ -20,6 +20,6 @@ public class AgendamentoDTO {
     @NotNull(message = "Obrigatorio!")
     private LocalDateTime dataHoraConsulta;
 
-    @NotBlank(message = "Obrigatorio!")
+    @NotNull(message = "Obrigatorio!")
     private TipoAtendimento tipoAtendimento;
 }

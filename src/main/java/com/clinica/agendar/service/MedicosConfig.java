@@ -20,7 +20,4 @@ public class MedicosConfig {
         return MEDICOS;
     }
 
-    public boolean
-
-
 }

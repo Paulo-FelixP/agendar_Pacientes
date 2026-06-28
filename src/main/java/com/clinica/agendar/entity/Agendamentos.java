@@ -23,12 +23,16 @@ public class Agendamentos {
     @JoinColumn(name = "paciente_id")
     private Paciente paciente;
 
-    private LocalDateTime DataHoraConsulta;
+    private LocalDateTime dataHoraConsulta;
 
     @Enumerated(EnumType.STRING)
     private TipoAtendimento tipoAtendimento;
 
     @Enumerated
-    private StatusAtendimento statusAtendimento;
+    private StatusAgendamento statusAgendamento;
+
+    private String medico;
+
+    private String motivoCancelamento;
 
 }
