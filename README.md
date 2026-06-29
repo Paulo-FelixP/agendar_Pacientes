@@ -151,7 +151,7 @@ spring.datasource.password
 
 ---
 
-# ▶️ Executando o Projeto
+# Executando o Projeto
 
 ## Clone o repositório
 
