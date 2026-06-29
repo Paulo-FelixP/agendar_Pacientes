@@ -1,8 +1,13 @@
 # Sistema de Agendamento de Clínica
 
-Sistema desenvolvido em Spring Boot para gerenciamento de pacientes e agendamentos médicos.
 
-## Tecnologias utilizadas
+A aplicação disponibiliza uma **API REST** integrada a um front-end desenvolvido em **HTML, CSS e JavaScript**, permitindo cadastrar pacientes, consultar médicos previamente cadastrados e realizar o gerenciamento completo dos agendamentos.
+
+---
+
+# Tecnologias Utilizadas
+
+## Back-end
 
 - Java 21
 - Spring Boot
@@ -12,96 +17,175 @@ Sistema desenvolvido em Spring Boot para gerenciamento de pacientes e agendament
 - Lombok
 - Oracle Database
 - SpringDoc OpenAPI (Swagger)
-- HTML
-- CSS
+
+## Front-end
+
+- HTML5
+- CSS3
 - JavaScript
 
 ---
 
 # Funcionalidades
 
-- Cadastro de pacientes.
-- Listagem de pacientes.
-- Listagem de médicos cadastrados.
-- Agendamento de consultas.
-- Cancelamento de consultas.
-- Consulta de horários disponíveis.
-- Filtro de agendamentos.
+- Cadastro de pacientes
+- Listagem de pacientes
+- Consulta de médicos cadastrados
+- Agendamento de consultas
+- Cancelamento de consultas
+- Consulta de horários disponíveis
+- Filtro de agendamentos
 
 ---
 
-# Regras de negócio
+# Regras de Negócio
 
-- Os médicos já estão cadastrados na base de dados.
+- Os médicos já são cadastrados previamente no sistema.
 - O usuário pode cadastrar novos pacientes.
-- Cada agendamento associa um paciente a um médico.
-- Um agendamento pode ser cancelado mediante justificativa.
+- Cada agendamento associa um paciente a apenas um médico.
+- Um paciente pode possuir vários agendamentos.
+- Consultas podem ser canceladas mediante justificativa.
 - Os horários disponíveis variam conforme o médico e a data selecionada.
 
 ---
 
 # Pré-requisitos
 
-Antes de executar o projeto é necessário possuir instalado:
+Antes de executar o projeto, é necessário possuir instalado:
 
 - Java 21
 - Maven
 - Oracle Database
+- Oracle SQL Developer (recomendado)
 - IntelliJ IDEA (ou outra IDE compatível)
 
 ---
 
-# Configuração do Oracle
+#  Configuração do Banco de Dados (Oracle)
 
-O projeto utiliza um banco Oracle executando localmente.
+## 1. Instale o Oracle Database
 
-1. Inicie o serviço do Oracle Database.
+Instale o **Oracle Database XE (Express Edition)** ou outra versão compatível.
 
-2. Crie (ou utilize) um usuário que possua permissões para criar e alterar tabelas.
-
-3. Configure as credenciais no arquivo:
-
-```
-src/main/resources/application.properties
-```
-
-Exemplo:
-
-```properties
-spring.datasource.url=jdbc:oracle:thin:@localhost:1521/XEPDB1
-spring.datasource.username=SEU_USUARIO
-spring.datasource.password=SUA_SENHA
-
-spring.jpa.hibernate.ddl-auto=update
-```
-
-Caso utilize outra porta, SID ou Service Name, altere a URL conforme sua instalação do Oracle.
-
-Após iniciar o banco de dados, execute normalmente a aplicação.
+Durante a instalação, defina a senha do usuário **SYSTEM**, pois ela será utilizada para administrar o banco.
 
 ---
 
-# Como executar
+## 2. Instale o Oracle SQL Developer
 
-Clone o projeto:
+Utilize o SQL Developer para:
 
-```bash
-git clone <url-do-repositorio>
+- visualizar tabelas;
+- executar comandos SQL;
+- consultar os registros;
+- criar usuários;
+- conceder permissões.
+
+---
+
+## 3. Conecte ao banco
+
+Crie uma nova conexão utilizando:
+
+| Campo | Valor |
+|-------|-------|
+| Usuário | SYSTEM |
+| Senha | Senha definida na instalação |
+| Host | localhost |
+| Porta | 1521 |
+| Service Name | XEPDB1 |
+
+Após preencher os dados:
+
+1. Clique em **Test**.
+2. Verifique se a mensagem **Success** foi exibida.
+3. Clique em **Connect**.
+
+> Recomenda-se utilizar o usuário **SYSTEM** para administração do banco, evitando utilizar o usuário **SYS**.
+
+---
+
+## 4. Crie o usuário da aplicação
+
+Execute o script abaixo:
+
+```sql
+CREATE USER clinica IDENTIFIED BY clinica123;
+
+GRANT CONNECT, RESOURCE TO clinica;
+
+ALTER USER clinica QUOTA UNLIMITED ON USERS;
 ```
 
-Abra o projeto na IDE.
+Esse usuário será utilizado pela aplicação.
 
-Aguarde o Maven baixar as dependências.
+---
+
+## 5. Configure a aplicação
+
+Arquivo:
+
+```text
+src/main/resources/application.properties
+```
+
+```properties
+spring.application.name=agendar
+
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521/XEPDB1
+spring.datasource.username=clinica
+spring.datasource.password=clinica123
+spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+Caso utilize outro usuário ou senha, altere:
+
+```properties
+spring.datasource.username
+spring.datasource.password
+```
+
+---
+
+# ▶️ Executando o Projeto
+
+## Clone o repositório
+
+```bash
+git clone <URL_DO_REPOSITORIO>
+```
+
+## Abra o projeto
+
+Importe o projeto em uma IDE compatível com Maven.
+
+Aguarde o download das dependências.
+
+## Inicie o Oracle Database
+
+Certifique-se de que o banco esteja em execução.
+
+## Execute a aplicação
 
 Execute a classe principal:
 
-```
+```text
 AgendarApplication.java
+```
+
+Na primeira execução, o Hibernate criará automaticamente as tabelas utilizando:
+
+```properties
+spring.jpa.hibernate.ddl-auto=update
 ```
 
 A aplicação ficará disponível em:
 
-```
+```text
 http://localhost:8080
 ```
 
@@ -111,52 +195,80 @@ http://localhost:8080
 
 Após iniciar a aplicação, acesse:
 
-```
+```text
 http://localhost:8080/swagger-ui/index.html
 ```
 
-ou
+Em algumas versões do SpringDoc:
 
-```
+```text
 http://localhost:8080/swagger-ui.html
 ```
-
-(dependendo da versão do SpringDoc utilizada).
 
 No Swagger é possível:
 
 - visualizar todos os endpoints;
-- consultar os parâmetros aceitos;
-- visualizar os modelos de requisição e resposta;
-- testar os endpoints diretamente pelo navegador.
+- consultar parâmetros;
+- visualizar exemplos de requisição e resposta;
+- testar a API diretamente pelo navegador.
 
 ---
 
-# Estrutura do projeto
+# 📁 Estrutura do Projeto
 
-```
-controller/
-service/
-repository/
-entity/
-dto/
-config/
-resources/
-static/
+```text
+src
+├── controller
+├── service
+├── repository
+├── entity
+├── dto
+├── config
+├── resources
+└── static
 ```
 
 ---
 
 # Front-end
 
-O front-end foi desenvolvido utilizando HTML, CSS e JavaScript puro.
+O front-end foi desenvolvido utilizando:
 
-Toda comunicação é realizada através da API REST desenvolvida em Spring Boot.
+- HTML5
+- CSS3
+- JavaScript
+
+Toda a comunicação com o banco de dados ocorre através da API REST desenvolvida em Spring Boot.
 
 ---
 
-# Observações
+# Consultando os Dados no Banco
 
-- Os médicos já são disponibilizados pelo sistema.
-- O foco da aplicação é o cadastro de pacientes e o gerenciamento de agendamentos.
-- As tabelas são criadas/atualizadas automaticamente pelo Hibernate conforme a configuração da aplicação.
+Após executar a aplicação e realizar alguns cadastros:
+
+1. Abra o Oracle SQL Developer.
+2. Conecte-se utilizando:
+
+| Campo | Valor |
+|-------|-------|
+| Usuário | clinica |
+| Senha | clinica123 |
+
+No painel esquerdo:
+
+```text
+Connections
+ └── clinica
+      └── Tables
+```
+
+Selecione uma tabela e clique na aba **Data** para visualizar os registros.
+
+---
+
+# 📝 Observações
+
+- Os médicos são previamente cadastrados no sistema.
+- O foco da aplicação é o gerenciamento de pacientes e agendamentos.
+- As tabelas são criadas ou atualizadas automaticamente pelo Hibernate.
+- A API possui documentação interativa utilizando Swagger.
